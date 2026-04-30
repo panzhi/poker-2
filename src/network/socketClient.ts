@@ -31,8 +31,11 @@ export class SocketClient {
   /**
    * 建立 WebSocket 连接。
    */
-  connect(url = import.meta.env.VITE_WS_URL || 'ws://localhost:8787'): Promise<void> {
-    if (this.socket && [WebSocket.OPEN, WebSocket.CONNECTING].includes(this.socket.readyState)) {
+  connect(url = import.meta.env.VITE_WS_URL || getDefaultWebSocketUrl()): Promise<void> {
+    if (
+      this.socket &&
+      (this.socket.readyState === WebSocket.OPEN || this.socket.readyState === WebSocket.CONNECTING)
+    ) {
       return Promise.resolve()
     }
 
@@ -72,6 +75,11 @@ export class SocketClient {
 
     this.socket.send(JSON.stringify({ type, payload }))
   }
+}
+
+function getDefaultWebSocketUrl(): string {
+  const protocol = window.location.protocol === 'https:' ? 'wss:' : 'ws:'
+  return `${protocol}//${window.location.host}/ws`
 }
 
 export const socketClient = new SocketClient()
