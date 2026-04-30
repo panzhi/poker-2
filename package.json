@@ -17,15 +17,18 @@
     "node": "18.x"
   },
   "dependencies": {
-    "pinia": "latest",
-    "vue": "latest",
+    "pinia": "3.0.4",
+    "vue": "3.5.33",
     "ws": "^8.18.3"
   },
   "devDependencies": {
-    "@vitejs/plugin-vue": "^5.2.4",
-    "typescript": "latest",
+    "@vitejs/plugin-vue": "5.2.4",
+    "typescript": "6.0.3",
     "vite": "5.4.21",
-    "vitest": "^3.2.4",
-    "vue-tsc": "latest"
+    "vitest": "3.2.4",
+    "vue-tsc": "3.2.7"
+  },
+  "resolutions": {
+    "vite": "5.4.21"
   }
 }
