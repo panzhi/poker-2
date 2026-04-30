@@ -50,4 +50,6 @@ export interface ScoreResult {
   winnerTeam: Team | 'draw'
   deltaByPlayerId: Record<string, number>
   sequence: string
+  label?: string
+  winnerPlayerId?: string
 }

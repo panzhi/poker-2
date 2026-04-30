@@ -87,6 +87,14 @@ export function evaluateHand(cards) {
     return { valid: false, type: null, power: 0, reason: '只能出 1-4 张牌' }
   }
 
+  if (isJokerPair(cards)) {
+    return {
+      valid: true,
+      type: 'pair',
+      power: Math.max(...cards.map((card) => card.power)),
+    }
+  }
+
   const firstPower = cards[0].power
   const sameRank = cards.every((card) => card.power === firstPower)
 
@@ -304,6 +312,10 @@ function applyFivePlayerBlackDoubleWin(players, deltaByPlayerId, multiplier) {
 
 function hasCard(player, cardId) {
   return player.hand.some((card) => card.id === cardId)
+}
+
+function isJokerPair(cards) {
+  return cards.length === 2 && cards.every((card) => card.suit === 'JOKER')
 }
 
 function createTeamSequence(byId, finishOrder) {

@@ -23,6 +23,25 @@ describe('hand evaluation rules', () => {
     expect(evaluateHand([card('S-A', 6), card('H-K', 5)])).toMatchObject({ valid: false })
   })
 
+  it('accepts big joker and small joker together as a pair', () => {
+    expect(evaluateHand([joker('BJ', 9), joker('SJ', 8)])).toMatchObject({
+      valid: true,
+      type: 'pair',
+      power: 9,
+    })
+  })
+
+  it('allows joker pair to beat any lower pair', () => {
+    const current: Trick = {
+      playerId: 'p1',
+      cards: [card('S-2', 7), card('H-2', 7)],
+      type: 'pair',
+      power: 7,
+    }
+
+    expect(canBeat([joker('BJ', 9), joker('SJ', 8)], current)).toMatchObject({ valid: true, type: 'pair' })
+  })
+
   it('allows any legal hand when starting a new trick', () => {
     expect(canBeat([card('S-9', 1)], null)).toMatchObject({ valid: true, type: 'single', power: 1 })
   })
@@ -61,6 +80,16 @@ function card(id: string, power: number): Card {
     suit: id.startsWith('JOKER') ? 'JOKER' : 'S',
     rank: 'A',
     color: 'black',
+    power,
+  }
+}
+
+function joker(rank: 'BJ' | 'SJ', power: number): Card {
+  return {
+    id: `JOKER-${rank}`,
+    suit: 'JOKER',
+    rank,
+    color: rank === 'BJ' ? 'red' : 'black',
     power,
   }
 }

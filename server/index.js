@@ -326,6 +326,11 @@ function markFinished(room, playerId) {
   player.finishedRank = room.finishOrder.length + 1
   room.finishOrder.push(player.id)
 
+  if (isChallengeBid(room.bid)) {
+    settleChallengeBid(room, player.id === room.bid.playerId)
+    return
+  }
+
   if (shouldSettleAfterFinish(room)) {
     settleRound(room)
     return
@@ -341,6 +346,45 @@ function markFinished(room, playerId) {
 
     settleRound(room)
   }
+}
+
+function isChallengeBid(bid) {
+  return bid?.type === 'xuan-bao' || bid?.type === 'solo'
+}
+
+function settleChallengeBid(room, success) {
+  completeRemainingPlayers(room)
+
+  const bidPlayer = findPlayer(room, room.bid.playerId)
+  const scorePerOpponent = room.bid.type === 'xuan-bao' ? 5 : 3
+  const deltaByPlayerId = Object.fromEntries(room.players.map((player) => [player.id, 0]))
+
+  for (const player of room.players) {
+    if (player.id === bidPlayer.id) {
+      deltaByPlayerId[player.id] = (success ? 1 : -1) * scorePerOpponent * (room.players.length - 1)
+    } else {
+      deltaByPlayerId[player.id] = success ? -scorePerOpponent : scorePerOpponent
+    }
+  }
+
+  for (const player of room.players) {
+    player.score += deltaByPlayerId[player.id] ?? 0
+  }
+
+  const bidLabel = room.bid.type === 'xuan-bao' ? '宣爆' : '独'
+  const resultLabel = `${bidPlayer.name} ${bidLabel}${success ? '成功' : '失败'}`
+
+  room.lastScoreResult = {
+    winnerTeam: 'draw',
+    winnerPlayerId: success ? bidPlayer.id : room.finishOrder[0],
+    deltaByPlayerId,
+    sequence: `SPECIAL:${room.bid.type}:${success ? 'SUCCESS' : 'FAIL'}`,
+    label: resultLabel,
+  }
+  room.phase = 'settlement'
+  room.currentPlayerId = null
+  room.dealerPlayerId = room.finishOrder[0] ?? room.dealerPlayerId
+  room.message = resultLabel
 }
 
 function shouldSettleAfterFinish(room) {

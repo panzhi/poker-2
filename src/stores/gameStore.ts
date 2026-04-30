@@ -84,6 +84,7 @@ export const useGameStore = defineStore('game', {
 
     winnerLabel(): string {
       if (!this.lastScoreResult) return ''
+      if (this.lastScoreResult.label) return this.lastScoreResult.label
       if (this.lastScoreResult.winnerTeam === 'draw') return '平局'
       return this.lastScoreResult.winnerTeam === 'red' ? '红队胜利' : '黑队胜利'
     },

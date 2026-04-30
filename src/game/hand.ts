@@ -24,6 +24,14 @@ export function evaluateHand(cards: readonly Card[]): HandResult {
     return { valid: false, type: null, power: 0, reason: '只能出 1-4 张牌' }
   }
 
+  if (isJokerPair(cards)) {
+    return {
+      valid: true,
+      type: 'pair',
+      power: Math.max(...cards.map((card) => card.power)),
+    }
+  }
+
   const firstPower = cards[0]?.power
   const sameRank = cards.every((card) => card.power === firstPower)
 
@@ -68,4 +76,8 @@ export function canBeat(candidate: readonly Card[], currentTrick: Trick | null):
   }
 
   return hand
+}
+
+function isJokerPair(cards: readonly Card[]): boolean {
+  return cards.length === 2 && cards.every((card) => card.suit === 'JOKER')
 }
