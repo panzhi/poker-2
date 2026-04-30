@@ -276,3 +276,7 @@ git -c http.proxy= -c https.proxy= clone https://github.com/panzhi/poker-2.git
 
 grep -R "127.0.0.1:1080" ~/.bashrc ~/.profile /etc/environment /etc/profile /etc/profile.d 2>/dev/null
 删掉对应那行后重新登录 SSH。
+
+
+
+sh scripts/deploy-docker.sh
