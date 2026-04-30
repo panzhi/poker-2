@@ -5,6 +5,7 @@ import { socketClient, type SnapshotPayload } from '../network/socketClient'
 
 interface GameStoreState {
   connected: boolean
+  messageSubscribed: boolean
   roomCode: string
   selfPlayerId: string | null
   ownerPlayerId: string | null
@@ -36,6 +37,7 @@ interface GameStoreState {
 export const useGameStore = defineStore('game', {
   state: (): GameStoreState => ({
     connected: false,
+    messageSubscribed: false,
     roomCode: '',
     selfPlayerId: null,
     ownerPlayerId: null,
@@ -100,10 +102,18 @@ export const useGameStore = defineStore('game', {
      * 连接多人服务端。
      */
     async connect(): Promise<void> {
-      await socketClient.connect()
-      this.connected = true
-      this.message = '已连接服务端'
+      try {
+        await socketClient.connect()
+        this.connected = true
+        this.message = '已连接服务端'
+      } catch (error) {
+        this.connected = false
+        this.message = error instanceof Error ? error.message : '连接服务端失败'
+        return
+      }
 
+      if (this.messageSubscribed) return
+      this.messageSubscribed = true
       socketClient.onMessage((message) => {
         if (message.type === 'snapshot') {
           this.applySnapshot(message.payload as SnapshotPayload)
@@ -122,6 +132,7 @@ export const useGameStore = defineStore('game', {
      */
     async createRoom(name: string, mode: 4 | 5): Promise<void> {
       await this.ensureConnected()
+      if (!this.connected) return
       socketClient.send('createRoom', { name, mode })
     },
 
@@ -130,6 +141,7 @@ export const useGameStore = defineStore('game', {
      */
     async joinRoom(name: string, roomCode: string): Promise<void> {
       await this.ensureConnected()
+      if (!this.connected) return
       socketClient.send('joinRoom', { name, roomCode })
     },
 
