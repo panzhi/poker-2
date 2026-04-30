@@ -15,14 +15,19 @@ export function scoreFourPlayers(
   const byId = createPlayerMap(players)
   const first = byId.get(finishOrder[0])
   const second = byId.get(finishOrder[1])
-  const third = byId.get(finishOrder[2])
 
-  if (!first?.team || !second?.team || !third?.team) {
+  if (!first?.team || !second?.team) {
     throw new Error('4 人局结算失败：玩家队伍未完成分配')
   }
 
   const sameTeamTopTwo = first.team === second.team
-  const winnerTeam = sameTeamTopTwo ? first.team : third.team
+
+  if (!sameTeamTopTwo && !byId.get(finishOrder[2])?.team) {
+    throw new Error('4 人局结算失败：第 3 名未产生')
+  }
+
+  const third = byId.get(finishOrder[2])
+  const winnerTeam: Team = sameTeamTopTwo ? first.team : third!.team!
   const baseScore = sameTeamTopTwo ? 2 : 1
   const deltaByPlayerId = createEmptyDelta(players)
 

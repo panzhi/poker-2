@@ -326,6 +326,11 @@ function markFinished(room, playerId) {
   player.finishedRank = room.finishOrder.length + 1
   room.finishOrder.push(player.id)
 
+  if (shouldSettleAfterFinish(room)) {
+    settleRound(room)
+    return
+  }
+
   if (room.finishOrder.length === room.players.length - 1) {
     const lastPlayer = room.players.find((item) => item.finishedRank === null)
 
@@ -338,7 +343,42 @@ function markFinished(room, playerId) {
   }
 }
 
+function shouldSettleAfterFinish(room) {
+  if (room.mode === 4) return shouldSettleFourPlayerRoom(room)
+  if (room.mode === 5) return shouldSettleFivePlayerRoom(room)
+
+  return false
+}
+
+function shouldSettleFourPlayerRoom(room) {
+  if (room.finishOrder.length < 2) return false
+
+  const first = findPlayer(room, room.finishOrder[0])
+  const second = findPlayer(room, room.finishOrder[1])
+
+  if (first.team === second.team) return true
+
+  return room.finishOrder.length >= 3
+}
+
+function shouldSettleFivePlayerRoom(room) {
+  const sequence = createFinishedTeamSequence(room)
+
+  if (sequence.length < 2) return false
+
+  if (sequence === 'RR') return true
+
+  if (sequence.length >= 3) {
+    if (sequence === 'BBB') return true
+    if (countTeam(sequence, 'R') === 2) return true
+  }
+
+  return sequence.length >= 4
+}
+
 function settleRound(room) {
+  completeRemainingPlayers(room)
+
   const multiplier = room.bid?.multiplier ?? 1
   const result = scoreRound(room.players, room.finishOrder, room.mode, multiplier)
 
@@ -351,6 +391,23 @@ function settleRound(room) {
   room.currentPlayerId = null
   room.dealerPlayerId = room.finishOrder[0] ?? room.dealerPlayerId
   room.message = result.winnerTeam === 'draw' ? `平局：${result.sequence}` : `${result.winnerTeam} 胜：${result.sequence}`
+}
+
+function completeRemainingPlayers(room) {
+  for (const player of room.players) {
+    if (player.finishedRank === null) {
+      player.finishedRank = room.finishOrder.length + 1
+      room.finishOrder.push(player.id)
+    }
+  }
+}
+
+function createFinishedTeamSequence(room) {
+  return room.finishOrder.map((playerId) => (findPlayer(room, playerId).team === 'red' ? 'R' : 'B')).join('')
+}
+
+function countTeam(sequence, teamCode) {
+  return sequence.split('').filter((item) => item === teamCode).length
 }
 
 function advanceTurn(room) {

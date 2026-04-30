@@ -21,6 +21,8 @@ pnpm-debug.log*
 
 # TypeScript / tooling cache
 *.tsbuildinfo
+src/**/*.d.ts
+!src/vite-env.d.ts
 
 # OS / editor
 .DS_Store

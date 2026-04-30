@@ -5,10 +5,16 @@ import type { Card, Player, Team } from '../../src/game/types'
 describe('4-player scoring rules', () => {
   it('awards double score when top two players are from the same team', () => {
     const players = [player('r1', 'red'), player('r2', 'red'), player('b1', 'black'), player('b2', 'black')]
-    const result = scoreFourPlayers(players, ['r1', 'r2', 'b1', 'b2'], 1)
+    const result = scoreFourPlayers(players, ['r1', 'r2'], 1)
 
     expect(result.winnerTeam).toBe('red')
     expect(result.deltaByPlayerId).toEqual({ r1: 2, r2: 2, b1: -2, b2: -2 })
+  })
+
+  it('cannot settle after only two finishers when top two players are from different teams', () => {
+    const players = [player('r1', 'red'), player('r2', 'red'), player('b1', 'black'), player('b2', 'black')]
+
+    expect(() => scoreFourPlayers(players, ['r1', 'b1'], 1)).toThrow('第 3 名未产生')
   })
 
   it('uses the third finisher team when top two players are from different teams', () => {
