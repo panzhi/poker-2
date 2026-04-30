@@ -9,6 +9,7 @@
     "server": "node server/index.js",
     "prebuild": "node scripts/check-node-version.cjs",
     "build": "vue-tsc --noEmit && vite build",
+    "test": "vitest run",
     "prepreview": "node scripts/check-node-version.cjs",
     "preview": "vite preview"
   },
@@ -24,6 +25,7 @@
     "@vitejs/plugin-vue": "^5.2.4",
     "typescript": "latest",
     "vite": "5.4.21",
+    "vitest": "^3.2.4",
     "vue-tsc": "latest"
   }
 }

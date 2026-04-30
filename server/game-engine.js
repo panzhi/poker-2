@@ -246,12 +246,12 @@ function scoreFivePlayers(players, finishOrder, multiplier) {
   }
 
   if (sequence === 'RRBBB') {
-    applyTeamDelta(players, deltaByPlayerId, 'red', 2 * multiplier, -2 * multiplier)
+    applyFivePlayerRedDoubleWin(players, deltaByPlayerId, multiplier)
     return { winnerTeam: 'red', deltaByPlayerId, sequence }
   }
 
   if (sequence === 'BBBRR') {
-    applyTeamDelta(players, deltaByPlayerId, 'black', 2 * multiplier, -2 * multiplier)
+    applyFivePlayerBlackDoubleWin(players, deltaByPlayerId, multiplier)
     return { winnerTeam: 'black', deltaByPlayerId, sequence }
   }
 
@@ -265,6 +265,34 @@ function applyTeamDelta(players, deltaByPlayerId, winnerTeam, winnerDelta, loser
   for (const player of players) {
     deltaByPlayerId[player.id] = player.team === winnerTeam ? winnerDelta : loserDelta
   }
+}
+
+function applyFivePlayerRedDoubleWin(players, deltaByPlayerId, multiplier) {
+  for (const player of players) {
+    if (hasCard(player, 'H-A')) {
+      deltaByPlayerId[player.id] = 4 * multiplier
+    } else if (hasCard(player, 'D-A')) {
+      deltaByPlayerId[player.id] = 2 * multiplier
+    } else {
+      deltaByPlayerId[player.id] = -2 * multiplier
+    }
+  }
+}
+
+function applyFivePlayerBlackDoubleWin(players, deltaByPlayerId, multiplier) {
+  for (const player of players) {
+    if (hasCard(player, 'H-A')) {
+      deltaByPlayerId[player.id] = -4 * multiplier
+    } else if (hasCard(player, 'D-A')) {
+      deltaByPlayerId[player.id] = -2 * multiplier
+    } else {
+      deltaByPlayerId[player.id] = 2 * multiplier
+    }
+  }
+}
+
+function hasCard(player, cardId) {
+  return player.hand.some((card) => card.id === cardId)
 }
 
 function createTeamSequence(byId, finishOrder) {
