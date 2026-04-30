@@ -1,0 +1,29 @@
+{
+  "name": "poker-2",
+  "private": true,
+  "version": "0.1.0",
+  "type": "module",
+  "scripts": {
+    "predev": "node scripts/check-node-version.cjs",
+    "dev": "vite",
+    "server": "node server/index.js",
+    "prebuild": "node scripts/check-node-version.cjs",
+    "build": "vue-tsc --noEmit && vite build",
+    "prepreview": "node scripts/check-node-version.cjs",
+    "preview": "vite preview"
+  },
+  "engines": {
+    "node": "18.x"
+  },
+  "dependencies": {
+    "pinia": "latest",
+    "vue": "latest",
+    "ws": "^8.18.3"
+  },
+  "devDependencies": {
+    "@vitejs/plugin-vue": "^5.2.4",
+    "typescript": "latest",
+    "vite": "5.4.21",
+    "vue-tsc": "latest"
+  }
+}
