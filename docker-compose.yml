@@ -13,6 +13,6 @@ services:
       dockerfile: Dockerfile.web
     restart: unless-stopped
     ports:
-      - "80:80"
+      - "5173:80"
     depends_on:
       - server
